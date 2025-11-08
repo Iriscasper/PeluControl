@@ -5,18 +5,21 @@ import MostrarLista from "./MostrarLista.jsx"
 import SinResultados from './SinResultados.jsx'
 
 function ListaClientes() {
-  const [busqueda, setBusqueda] = useState("")
+  const [lista, setLista] = useState(clientesIniciales)
+  
+  const filtrar = (filtro) => {
+    let listaFiltrada = clientesIniciales.filter(cliente =>
+    cliente.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
+    cliente.telefono.includes(filtro))
+    setLista(listaFiltrada)
+  }
 
-  const clientesFiltrados = clientesIniciales.filter(cliente =>
-    cliente.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-    cliente.telefono.includes(busqueda)
-)
   return (
     <div>
       <h3>Lista de clientes</h3>
-      <CampoBúsqueda value={busqueda} onChange={(e) => setBusqueda(e.target.value)}/>
-      {clientesFiltrados.length > 0 ?
-        clientesFiltrados.map(cliente => <MostrarLista key={cliente.id} cliente={cliente} />) : 
+      <CampoBúsqueda onChange={(e) => filtrar(e.target.value)}/>
+      {lista.length > 0 ?
+        <MostrarLista lista={lista} /> : 
         <SinResultados />}
     </div>
   )

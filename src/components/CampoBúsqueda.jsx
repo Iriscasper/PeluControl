@@ -1,4 +1,4 @@
-function CampoBúsqueda({ value, onChange }) {
+function CampoBúsqueda({ onChange }) {
   return (
     <div>
       <label htmlFor="buscar">Filtrar por nombre o teléfono: </label>
@@ -7,7 +7,6 @@ function CampoBúsqueda({ value, onChange }) {
         id="buscar"
         name="buscar"
         placeholder={"Escribe aquí..."}
-        value={value}
         onChange={onChange}
       />
     </div>
