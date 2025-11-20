@@ -85,6 +85,15 @@ li {
   visibility: hidden
 }
 
+.error {
+  font-variant: small-caps;
+  color: red;
+}
+
+.ant-spin-text {
+  text-shadow: none !important;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

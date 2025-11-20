@@ -1,6 +1,6 @@
 function CampoBúsqueda({ onChange }) {
   return (
-    <div>
+    <div style={{ marginBottom: "1em" }}>
       <label htmlFor="buscar">Filtrar por nombre o teléfono: </label>
       <input
         type="search"

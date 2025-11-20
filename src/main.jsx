@@ -4,7 +4,5 @@ import ListaClientes from "./components/ListaClientes"
 import "./css/index.css"
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
     <ListaClientes />
-  </StrictMode>
 )
