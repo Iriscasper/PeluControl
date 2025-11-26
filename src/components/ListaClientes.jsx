@@ -7,16 +7,18 @@ import Paginacion from "./Paginacion.jsx"
 import SelectorPaginacion from "./SelectorPaginacion.jsx"
 import Ordenar from "./Ordenar.jsx"
 import Loader from "./Loader.jsx"
+import AddCliente from "./AddCliente.jsx"
 
 function ListaClientes() {
   const [lista, setLista] = useState([]) // Lista de clientes inicial
-  const [listaPaginada, setListaPaginada] = useState(clientesIniciales)
+  const [listaPaginada, setListaPaginada] = useState(lista)
   const [offset, setOffset] = useState(0) // Aquí cargaremos los offsets definidos en Paginacion, para poder mostrarlos acordemente
   const [clientesPerPage, setClientesPerPage] = useState(5)
   const [toggleNombre, setToggleNombre] = useState(false)
   const [toggleTelefono, setToggleTelefono] = useState(false)
   const [cargando, setCargando] = useState(false) // Simulación del estado del fetch
   const [error, setError] = useState(false)
+  const [addForm, setAddForm] = useState(false) // Controla si aparece o no el formulario de adición
 
   // FILTRO
   // Lógica del filtro, lo que introduces en la caja de texto es el parámetro para filtrar la lista de objetos
@@ -55,6 +57,7 @@ function ListaClientes() {
     setCargando(false)
   }
 
+  // La paginación y el filtrado son dinámicos gracias a este useEffect
   useEffect(
     () => {
       onPaginate()
@@ -69,13 +72,20 @@ function ListaClientes() {
     setTimeout(cargarClientes, 2000)
   }, [])
 
+  useEffect(() => {
+    console.log(`estado? ${addForm}`)
+  }, [addForm])
+
   return (
     <div>
       <h2>Lista de clientes</h2>
-      {cargando ?
-        <Loader /> : error ?
-        <p className="error">Error al cargar los datos</p> :
-          <>
+      {cargando ? (
+        <Loader />
+      ) : error ? (
+        <p className="error">Error al cargar los datos</p>
+      ) : (
+        <>
+          {!addForm && <AddCliente onClick={() => setAddForm(!addForm)} />}
           <CampoBúsqueda onChange={(texto) => filtrar(texto.target.value)} />
           <Ordenar
             onClickNombre={ordenarPorNombre}
@@ -97,9 +107,11 @@ function ListaClientes() {
           <SelectorPaginacion
             onChange={(num) => setClientesPerPage(parseInt(num.target.value))}
           />
-          </>
-      }
-      <button style={{ marginTop: "2.5em" }} onClick={() => setError(!error)}>Simular error</button>
+        </>
+      )}
+      <button style={{ marginTop: "2.5em" }} onClick={() => setError(!error)}>
+        Simular error
+      </button>
     </div>
   )
 }
