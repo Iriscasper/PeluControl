@@ -1,4 +1,4 @@
-import clientesIniciales from "./clientes.js"
+import clientesIniciales from "../data/clientes.js"
 
 export function agregarCliente(nuevoCliente) {
   // Autoincrementamos el id del usuario
@@ -11,14 +11,11 @@ export function agregarCliente(nuevoCliente) {
   })
 }
 
-export function editarClienteAction(cliente) {
-  console.log(cliente)
-  var index = clientesIniciales.findIndex((e) => {
-    e.id == cliente.id
-  })
-  clientesIniciales[index] = cliente
-  console.log("valor del cliente: ")
-  console.log(cliente)
-  console.log("Valor en la lista ")
-  console.log(clientesIniciales[index])
+export function editarClienteAction(id, cliente) {
+  var index = clientesIniciales.findIndex((e) => e.id == id)
+  clientesIniciales[index] = {
+    id: id,
+    nombre: cliente.get("nombre"),
+    telefono: cliente.get("telefono"),
+  }
 }

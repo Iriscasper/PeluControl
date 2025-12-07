@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState } from "react"
-import { agregarCliente, editarClienteAction } from "./actions.js"
-import clientesIniciales from "./clientes.js"
+import { agregarCliente, editarClienteAction } from "../utils/actions.js"
+import clientesIniciales from "../data/clientes.js"
 import CampoBúsqueda from "./CampoBúsqueda.jsx"
 import MostrarLista from "./MostrarLista.jsx"
 import SinResultados from "./SinResultados.jsx"
@@ -22,6 +22,7 @@ function ListaClientes() {
   const [error, setError] = useState(false) // Simulación de error al cargar
   const [formVisibility, setFormVisibility] = useState(false) // Controla si aparece o no el formulario
   const [clienteAEditar, setClienteAEditar] = useState(null)
+  const [formType, setFormType] = useState(null)
 
   const refForm = useRef(null) // Crea una referencia
 
@@ -65,6 +66,7 @@ function ListaClientes() {
   function editarCliente(cliente) {
     setFormVisibility(true)
     setClienteAEditar(cliente)
+    setFormType("editar")
   }
 
   // La paginación y el filtrado son dinámicos gracias a este useEffect
@@ -73,7 +75,7 @@ function ListaClientes() {
       onPaginate()
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [offset, clientesPerPage, lista, toggleNombre, toggleTelefono]
+    [offset, clientesPerPage, lista, toggleNombre, toggleTelefono, formVisibility]
   )
 
   // Simulamos la carga de clientes
@@ -81,9 +83,6 @@ function ListaClientes() {
     setCargando(true)
     setTimeout(cargarClientes, 2000)
   }, [])
-
-  console.log("Cliente cargado:")
-  console.log(clienteAEditar)
 
   return (
     <div>
@@ -102,6 +101,7 @@ function ListaClientes() {
               onClick={() => {
                 setFormVisibility(true)
                 setClienteAEditar(null)
+                setFormType("crear")
               }}
             />
           )}
@@ -110,19 +110,22 @@ function ListaClientes() {
             <form
               ref={refForm}
               action={async (formData) => {
-                console.log("Form data:")
-                console.log(formData)
-                if (clienteAEditar) await editarClienteAction(formData)
-                else await agregarCliente(formData)
+                if (formType=="editar") await editarClienteAction(clienteAEditar.id, formData)
+                else if (formType=="crear") await agregarCliente(formData)
                 refForm.current.reset()
                 setFormVisibility(false)
+                setClienteAEditar(null)
+                setFormType(null)
               }}
             >
               <AddClienteForm
                 onClick={() => {
                   setFormVisibility(false)
+                  setFormType(null)
                 }}
                 datos={clienteAEditar}
+                setDatos={setClienteAEditar}
+                formType={formType}
               />
             </form>
           )}
