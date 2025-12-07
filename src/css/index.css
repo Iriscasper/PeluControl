@@ -94,6 +94,11 @@ li {
   text-shadow: none !important;
 }
 
+.edit-btn {
+  padding: 0;
+  margin-left: 12px;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

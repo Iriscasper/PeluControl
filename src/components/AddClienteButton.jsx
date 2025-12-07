@@ -1,7 +1,7 @@
 import React from "react"
 
-function AddCliente(onClick) {
+function AddClienteButton({ onClick }) {
   return <button onClick={onClick}>Añadir cliente</button>
 }
 
-export default AddCliente
+export default AddClienteButton

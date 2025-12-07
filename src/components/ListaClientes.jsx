@@ -1,4 +1,5 @@
-import { useEffect, useEffectEvent, useState } from "react"
+import { useEffect, useEffectEvent, useRef, useState } from "react"
+import { agregarCliente, editarClienteAction } from "./actions.js"
 import clientesIniciales from "./clientes.js"
 import CampoBúsqueda from "./CampoBúsqueda.jsx"
 import MostrarLista from "./MostrarLista.jsx"
@@ -7,7 +8,8 @@ import Paginacion from "./Paginacion.jsx"
 import SelectorPaginacion from "./SelectorPaginacion.jsx"
 import Ordenar from "./Ordenar.jsx"
 import Loader from "./Loader.jsx"
-import AddCliente from "./AddCliente.jsx"
+import AddClienteButton from "./AddClienteButton.jsx"
+import AddClienteForm from "./AddClienteForm.jsx"
 
 function ListaClientes() {
   const [lista, setLista] = useState([]) // Lista de clientes inicial
@@ -17,8 +19,11 @@ function ListaClientes() {
   const [toggleNombre, setToggleNombre] = useState(false)
   const [toggleTelefono, setToggleTelefono] = useState(false)
   const [cargando, setCargando] = useState(false) // Simulación del estado del fetch
-  const [error, setError] = useState(false)
-  const [addForm, setAddForm] = useState(false) // Controla si aparece o no el formulario de adición
+  const [error, setError] = useState(false) // Simulación de error al cargar
+  const [formVisibility, setFormVisibility] = useState(false) // Controla si aparece o no el formulario
+  const [clienteAEditar, setClienteAEditar] = useState(null)
+
+  const refForm = useRef(null) // Crea una referencia
 
   // FILTRO
   // Lógica del filtro, lo que introduces en la caja de texto es el parámetro para filtrar la lista de objetos
@@ -57,6 +62,11 @@ function ListaClientes() {
     setCargando(false)
   }
 
+  function editarCliente(cliente) {
+    setFormVisibility(true)
+    setClienteAEditar(cliente)
+  }
+
   // La paginación y el filtrado son dinámicos gracias a este useEffect
   useEffect(
     () => {
@@ -72,30 +82,64 @@ function ListaClientes() {
     setTimeout(cargarClientes, 2000)
   }, [])
 
-  useEffect(() => {
-    console.log(`estado? ${addForm}`)
-  }, [addForm])
+  console.log("Cliente cargado:")
+  console.log(clienteAEditar)
 
   return (
     <div>
+      {/* Título */}
       <h2>Lista de clientes</h2>
+      {/* Cargando / error / Mostrar el resto de la aplicación  */}
       {cargando ? (
         <Loader />
       ) : error ? (
         <p className="error">Error al cargar los datos</p>
       ) : (
         <>
-          {!addForm && <AddCliente onClick={() => setAddForm(!addForm)} />}
+          {/* Botón de aádir cliente */}
+          {!formVisibility && (
+            <AddClienteButton
+              onClick={() => {
+                setFormVisibility(true)
+                setClienteAEditar(null)
+              }}
+            />
+          )}
+          {/* Formulario de adición */}
+          {formVisibility && (
+            <form
+              ref={refForm}
+              action={async (formData) => {
+                console.log("Form data:")
+                console.log(formData)
+                if (clienteAEditar) await editarClienteAction(formData)
+                else await agregarCliente(formData)
+                refForm.current.reset()
+                setFormVisibility(false)
+              }}
+            >
+              <AddClienteForm
+                onClick={() => {
+                  setFormVisibility(false)
+                }}
+                datos={clienteAEditar}
+              />
+            </form>
+          )}
+          {/* Campo de búsqueda */}
           <CampoBúsqueda onChange={(texto) => filtrar(texto.target.value)} />
+          {/* Sorting */}
           <Ordenar
             onClickNombre={ordenarPorNombre}
             onClickTelefono={ordenarPorTelefono}
           />
+          {/* Lista */}
           {lista.length > 0 ? (
-            <MostrarLista lista={listaPaginada} />
+            <MostrarLista lista={listaPaginada} editarCliente={editarCliente} />
           ) : (
             <SinResultados />
           )}
+          {/* Paginación */}
           {clientesPerPage < lista.length && (
             <Paginacion
               lista={lista}
@@ -104,11 +148,13 @@ function ListaClientes() {
               clientesPerPage={clientesPerPage}
             />
           )}
+          {/* Número de resultados paginados */}
           <SelectorPaginacion
             onChange={(num) => setClientesPerPage(parseInt(num.target.value))}
           />
         </>
       )}
+      {/* Botón para simular error de carga */}
       <button style={{ marginTop: "2.5em" }} onClick={() => setError(!error)}>
         Simular error
       </button>
